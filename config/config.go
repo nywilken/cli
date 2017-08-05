@@ -46,5 +46,19 @@ func Write(f filer) error {
 	if err != nil {
 		return err
 	}
+	if err := ensureDir(f); err != nil {
+		return err
+	}
 	return ioutil.WriteFile(f.File(), b, os.FileMode(0644))
+}
+
+func ensureDir(f filer) error {
+	dir := filepath.Dir(f.File())
+	if _, err := os.Stat(dir); err == nil || !os.IsNotExist(err) {
+		return err
+	}
+	if err := os.MkdirAll(dir, os.FileMode(0755)); err != nil {
+		return err
+	}
+	return nil
 }
